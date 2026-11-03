@@ -1,0 +1,71 @@
+{
+ "users": [
+  {
+   "id": "24aa252279d3",
+   "role": "store",
+   "name": "Gerente Demo",
+   "email": "loja@demo.com",
+   "salt": "bc73501a70fe",
+   "pass": "5d138c94d9e4e48b58d87bad1b3d1cf16d7ba55422ab4666900465f48d6d01f1",
+   "storeId": "46dde7d2134b"
+  },
+  {
+   "id": "66fbd2eb9e60",
+   "role": "courier",
+   "name": "Motoboy Demo",
+   "email": "motoboy@demo.com",
+   "salt": "328b7e47eadb",
+   "pass": "b6ea7576d26e39f6f2ae38c03a2d671c664b830541fac329dbf6c8acfd5b937c",
+   "storeId": "46dde7d2134b"
+  }
+ ],
+ "stores": [
+  {
+   "id": "46dde7d2134b",
+   "name": "Loja Campo Mourão",
+   "address": "Av. Capitão Índio Bandeira, 1400, Centro, Campo Mourão - PR",
+   "lat": -24.0457,
+   "lng": -52.3787
+  }
+ ],
+ "orders": [
+  {
+   "id": "d2a893da218e",
+   "storeId": "46dde7d2134b",
+   "source": "ifood",
+   "ifoodId": "IF0f77500b2862",
+   "customer": {
+    "id": "IFC1aff05a08161",
+    "name": "Mariana Costa",
+    "phone": "44994964715"
+   },
+   "address": "Av. Goioerê, 820, Centro, Campo Mourão - PR",
+   "lat": -24.039295,
+   "lng": -52.378034,
+   "code": "9211",
+   "status": "DELIVERED",
+   "courierId": "66fbd2eb9e60",
+   "createdAt": 1793318085843,
+   "deliveredAt": 1793318733035
+  },
+  {
+   "id": "daa978d07fde",
+   "storeId": "46dde7d2134b",
+   "source": "ifood",
+   "ifoodId": "IFe0e09efdc123",
+   "customer": {
+    "id": "IFC5029ff894aa3",
+    "name": "Diego Ramos",
+    "phone": "44991685465"
+   },
+   "address": "Av. Capitão Índio Bandeira, 1850, Centro, Campo Mourão - PR",
+   "lat": -24.04291,
+   "lng": -52.3812,
+   "code": "3764",
+   "status": "PICKED",
+   "courierId": "66fbd2eb9e60",
+   "createdAt": 1793318745508
+  }
+ ],
+ "locations": {}
+}

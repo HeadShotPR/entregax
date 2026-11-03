@@ -1,0 +1,15 @@
+{
+  "name": "entregax",
+  "version": "1.0.0",
+  "description": "EntregaX — Suas entregas no caminho certo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["entregax", "ifood", "delivery"],
+  "author": "EntregaX",
+  "license": "ISC"
+}
