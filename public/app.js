@@ -366,7 +366,6 @@ function renderStore() {
       </div>
     </div>
     <button class="btn ghost sm" id="nw">+ Pedido</button>
-    <button class="btn ghost sm" id="sm" title="Simular Pedido do iFood">⚡ iFood Teste</button>
     <button class="btn ok sm" id="hm" title="Gestão da Loja no iFood">🏪 Gestão da Loja iFood</button>
     <button class="btn ghost sm" id="cr">Motoboys</button>
     <button class="btn ghost sm" id="cf" title="Configurar Merchant ID">⚙️</button>
@@ -385,7 +384,6 @@ function renderStore() {
   initMap();
 
   $('#lo').onclick = logout;
-  $('#sm').onclick = () => act(() => api('/ifood/simulate', 'POST'), 'Pedido de teste iFood recebido!');
   $('#hm').onclick = openHomologacaoModal;
   
   $('#cf').onclick = () => modal(`
@@ -475,7 +473,7 @@ function drawStore() {
         </div>
       ` : ''}
     </div>
-  `).join('') || '<div class="card muted" style="text-align:center">Nenhum pedido ativo. Clique em <b>⚡ iFood Teste</b> para gerar pedidos de simulação.</div>';
+  `).join('') || '<div class="card muted" style="text-align:center">Nenhum pedido ativo no momento. Aguardando novos pedidos do iFood...</div>';
 
   document.querySelectorAll('[data-c]').forEach(s => s.onchange = () => s.value && act(() => api(`/orders/${s.dataset.c}/dispatch`, 'POST', { courierId: s.value }), 'Pedido despachado!'));
   document.querySelectorAll('[data-x]').forEach(b => b.onclick = () => confirm('Deseja cancelar este pedido?') && act(() => api(`/orders/${b.dataset.x}/cancel`, 'POST')));
