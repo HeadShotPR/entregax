@@ -83,149 +83,167 @@ function renderLogin(mode = 'login') {
       : await api('/login', 'POST', b);
     session = { token: j.token };
     localStorage.setItem('entregax_session', JSON.stringify(session));
-    // ---------- Homologação iFood (Vídeos e Cenários do Módulo Merchant) ----------
+    // ---------- Gestão Oficial da Loja iFood (Painel do Restaurante) ----------
 async function openHomologacaoModal() {
   modal(`
-    <div style="max-height:85vh;overflow-y:auto;padding-right:4px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:24px;">📋</span>
+    <div style="max-height:85vh;overflow-y:auto;padding-right:6px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;border-bottom:1px solid #334155;padding-bottom:12px;">
+        <span style="font-size:28px;">🏪</span>
         <div>
-          <h2 style="font-size:18px;">Homologação iFood Oficial</h2>
-          <p class="muted" style="font-size:11px;">Módulo Merchant — Checklist de Validação por Vídeo</p>
+          <h2 style="font-size:18px;font-weight:800;">Gestão da Loja iFood</h2>
+          <p class="muted" style="font-size:12px;">Controle de Operação, Pausas e Horários Integrados</p>
         </div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 1: Informações da Loja
+      <!-- Módulo 1: Detalhes e Disponibilidade -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Dados do Estabelecimento</b>
+          <span class="badge READY" id="stBadge">Consultar</span>
         </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          1. Listar lojas vinculadas<br>
-          2. Exibir detalhes completos da loja<br>
-          3. Consultar disponibilidade em tempo real no iFood
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Consulte o status operacional da loja e a disponibilidade de vendas diretamente na plataforma do iFood.
         </p>
-        <button class="btn sm block" id="btnC1">Executar Cenário 1 (Consultar Loja)</button>
-        <div id="resC1" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
+        <button class="btn sm block" id="btnC1">Sincronizar Dados da Loja</button>
+        <div id="resC1" class="muted" style="font-size:12px;margin-top:10px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 2: Interrupções / Pausas
+      <!-- Módulo 2: Pausas e Interrupções Operacionais -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Pausas Operacionais (Interrupção)</b>
+          <span style="font-size:11px;color:#94a3b8">Cozinha / Alta Demanda</span>
         </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          1. Cadastrar pausa na loja<br>
-          2. Listar pausas ativas<br>
-          3. Remover a pausa
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Pause temporariamente o recebimento de novos pedidos no iFood em momentos de pico ou manutenção.
+        </p>
+        
+        <div style="margin-bottom:10px;">
+          <label class="muted" style="font-size:11px;display:block;margin-bottom:4px;">Motivo da Pausa:</label>
+          <input id="pDesc" value="Pausa operacional para controle de demanda" style="margin:0 0 8px 0;padding:10px;font-size:13px;">
+          <div class="row">
+            <button class="btn ok sm grow" id="btnC2Add">Pausar Loja no iFood (30 min)</button>
+            <button class="btn sec sm grow" id="btnC2List">Consultar Pausas Ativas</button>
+          </div>
+        </div>
+        <div id="resC2" class="muted" style="font-size:12px;margin-top:8px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
+      </div>
+
+      <!-- Módulo 3: Horários de Funcionamento Semanal -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Horário de Funcionamento</b>
+          <span style="font-size:11px;color:#10b981">Grade Oficial</span>
+        </div>
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Grade semanal de atendimento sincronizada com o Portal do Parceiro:<br>
+          • <b>Sábado:</b> 10:00 às 19:00<br>
+          • <b>Domingo:</b> 09:00 às 12:00 | 13:00 às 16:00 | 17:00 às 23:00
         </p>
         <div class="row">
-          <button class="btn sm grow" id="btnC2Add">+ Criar Pausa (30 min)</button>
-          <button class="btn sec sm grow" id="btnC2List">Listar Pausas</button>
+          <button class="btn sm grow" id="btnC3Set">Salvar Grade de Horários</button>
+          <button class="btn sec sm grow" id="btnC3Get">Consultar Grade Atual</button>
         </div>
-        <div id="resC2" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
+        <div id="resC3" class="muted" style="font-size:12px;margin-top:8px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 3: Horário de Funcionamento
-        </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          • Sábado: 10:00 às 19:00<br>
-          • Domingo: 09:00 às 12:00, 13:00 às 16:00 e 17:00 às 23:00
-        </p>
-        <div class="row">
-          <button class="btn sm grow" id="btnC3Set">Gravar Horários Oficiais</button>
-          <button class="btn sec sm grow" id="btnC3Get">Consultar Horários</button>
-        </div>
-        <div id="resC3" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
-      </div>
-
-      <button class="btn sec block mt" id="x">Fechar Painel</button>
+      <button class="btn sec block mt" id="x">Concluir e Fechar</button>
     </div>
   `, () => {
     const testMid = 'a924c951-713b-43ad-b941-3b4b3b5aec4f';
 
-    // Cenário 1
+    // 1. Dados e Disponibilidade
     $('#btnC1').onclick = () => act(async () => {
       $('#resC1').style.display = 'block';
-      $('#resC1').innerHTML = '⏳ Conectando à API do iFood...';
+      $('#resC1').innerHTML = '⏳ Conectando aos servidores do iFood...';
       const stores = await api('/ifood-merchant/stores');
       const det = await api('/ifood-merchant/details/' + testMid);
-      $('#resC1').innerHTML = `
-        <b style="color:#10b981">✓ Lojas Vinculadas:</b> ${stores.length} loja(s)<br>
-        • ID: ${det.details.id}<br>
-        • Nome: <b>${det.details.name}</b><br>
-        • Disponibilidade iFood: <span style="color:#f59e0b">${det.status[0]?.message?.title || 'OK'} (${det.status[0]?.state || 'ATIVO'})</span><br>
-        <span style="color:#94a3b8">Requisições HTTP 200 registradas nos Logs da API.</span>
-      `;
-    }, 'Cenário 1 executado com sucesso!');
+      const isAvail = det.status[0]?.available;
+      $('#stBadge').className = isAvail ? 'badge DELIVERED' : 'badge CANCELLED';
+      $('#stBadge').innerText = isAvail ? 'Loja Aberta' : 'Loja Fechada';
 
-    // Cenário 2
+      $('#resC1').innerHTML = `
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Informações Sincronizadas com Sucesso:</div>
+        • <b>Estabelecimento:</b> ${det.details.name}<br>
+        • <b>Merchant ID:</b> <code>${det.details.id}</code><br>
+        • <b>Status no iFood:</b> <span style="color:#f59e0b;font-weight:700">${det.status[0]?.message?.title || 'OK'}</span> (${det.status[0]?.state})<br>
+        • <b>Canal de Venda:</b> ${det.status[0]?.salesChannel} (${det.status[0]?.operation})
+      `;
+    }, 'Dados sincronizados com o iFood!');
+
+    // 2. Pausas
     $('#btnC2Add').onclick = () => act(async () => {
       $('#resC2').style.display = 'block';
-      $('#resC2').innerHTML = '⏳ Cadastrando pausa de 30 min no iFood...';
+      $('#resC2').innerHTML = '⏳ Enviando pausa programada para o iFood...';
       const now = new Date();
       const start = new Date(now.getTime() + 60000).toISOString();
       const end = new Date(now.getTime() + 1860000).toISOString();
+      const desc = $('#pDesc').value || 'Pausa operacional para controle de demanda';
       const p = await api('/ifood-merchant/interruptions/' + testMid, 'POST', {
-        description: 'Pausa para validação de homologação',
+        description: desc,
         start,
         end
       });
       $('#resC2').innerHTML = `
-        <b style="color:#10b981">✓ Pausa Cadastrada no iFood!</b><br>
-        • ID da Pausa: <code>${p.id}</code><br>
-        • Início: ${p.start} | Fim: ${p.end}<br>
-        <button class="btn sm ok mt" id="btnDelP" style="width:100%">Remover Pausa Agora</button>
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Pausa Ativada no iFood!</div>
+        • <b>Motivo:</b> ${desc}<br>
+        • <b>Período:</b> Das ${new Date(start).toLocaleTimeString('pt-BR')} até ${new Date(end).toLocaleTimeString('pt-BR')}<br>
+        <button class="btn sm ok mt" id="btnDelP" style="width:100%;font-weight:700">Retomar Loja / Remover Pausa no iFood</button>
       `;
       $('#btnDelP').onclick = () => act(async () => {
         await api(`/ifood-merchant/interruptions/${testMid}/${p.id}`, 'DELETE');
-        $('#resC2').innerHTML = '<b style="color:#10b981">✓ Pausa Removida com sucesso no iFood!</b>';
+        $('#resC2').innerHTML = '<div style="color:#10b981;font-weight:700">✓ Pausa Removida! A loja voltou a ficar disponível para vendas no iFood.</div>';
       }, 'Pausa removida no iFood!');
-    }, 'Pausa cadastrada com sucesso!');
+    }, 'Pausa ativada no iFood!');
 
     $('#btnC2List').onclick = () => act(async () => {
       $('#resC2').style.display = 'block';
-      $('#resC2').innerHTML = '⏳ Consultando pausas no iFood...';
+      $('#resC2').innerHTML = '⏳ Consultando pausas ativas...';
       const list = await api('/ifood-merchant/interruptions/' + testMid);
       if (!list || !list.length) {
-        $('#resC2').innerHTML = '<b>Nenhuma pausa ativa no momento no iFood.</b>';
+        $('#resC2').innerHTML = '<div style="color:#10b981">Nenhuma pausa ativa no momento. A loja opera normalmente.</div>';
       } else {
         $('#resC2').innerHTML = `
-          <b>Pausas Ativas (${list.length}):</b><br>
-          ${list.map(x => `• ${x.description} (até ${x.end}) <button class="btn sm sec" data-del="${x.id}">Excluir</button>`).join('<br>')}
+          <b>Pausas Registradas no iFood (${list.length}):</b><br>
+          ${list.map(x => `
+            <div style="margin-top:6px;padding:6px;background:#0b1120;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+              <div>• ${x.description}<br><small class="muted">Término: ${new Date(x.end).toLocaleTimeString('pt-BR')}</small></div>
+              <button class="btn sm sec" data-del="${x.id}">Encerrar</button>
+            </div>
+          `).join('')}
         `;
         document.querySelectorAll('[data-del]').forEach(b => {
           b.onclick = () => act(async () => {
             await api(`/ifood-merchant/interruptions/${testMid}/${b.dataset.del}`, 'DELETE');
             $('#btnC2List').click();
-          }, 'Pausa excluída!');
+          }, 'Pausa encerrada!');
         });
       }
     });
 
-    // Cenário 3
+    // 3. Horários
     $('#btnC3Set').onclick = () => act(async () => {
       $('#resC3').style.display = 'block';
-      $('#resC3').innerHTML = '⏳ Gravando horários oficiais no iFood...';
+      $('#resC3').innerHTML = '⏳ Gravando grade oficial de horários no iFood...';
       const r = await api('/ifood-merchant/opening-hours/' + testMid, 'PUT', {});
       $('#resC3').innerHTML = `
-        <b style="color:#10b981">✓ Horários Oficiais Cadastrados no iFood!</b><br>
-        • Sábado: 10:00 às 19:00 (540 min)<br>
-        • Domingo: 09:00 às 12:00, 13:00 às 16:00 e 17:00 às 23:00<br>
-        <span style="color:#94a3b8">Turnos configurados: ${r.shifts?.length || 4} turnos</span>
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Grade de Horários Atualizada com Sucesso!</div>
+        • <b>Sábado:</b> 10:00 às 19:00 (540 min)<br>
+        • <b>Domingo:</b> 09:00 às 12:00 | 13:00 às 16:00 | 17:00 às 23:00<br>
+        <span style="color:#94a3b8;font-size:11px">Turnos ativos no iFood: ${r.shifts?.length || 4} períodos</span>
       `;
-    }, 'Horários oficiais gravados no iFood!');
+    }, 'Horários atualizados no iFood!');
 
     $('#btnC3Get').onclick = () => act(async () => {
       $('#resC3').style.display = 'block';
-      $('#resC3').innerHTML = '⏳ Consultando horários salvos no iFood...';
+      $('#resC3').innerHTML = '⏳ Consultando grade cadastrada no iFood...';
       const r = await api('/ifood-merchant/opening-hours/' + testMid);
       const shifts = r.shifts || [];
       $('#resC3').innerHTML = `
-        <b style="color:#10b981">✓ Horários Retornados pela API do iFood:</b><br>
-        ${shifts.map(s => `• <b>${s.dayOfWeek}</b> das ${s.start} (${s.duration} min)`).join('<br>')}
+        <b>Grade de Horários Retornada pelo iFood:</b><br>
+        ${shifts.map(s => `• <b>${s.dayOfWeek}</b> das ${s.start} (Duração: ${s.duration} min)`).join('<br>')}
       `;
-    }, 'Horários consultados!');
+    }, 'Grade consultada com sucesso!');
   });
 }
 
@@ -349,7 +367,7 @@ function renderStore() {
     </div>
     <button class="btn ghost sm" id="nw">+ Pedido</button>
     <button class="btn ghost sm" id="sm" title="Simular Pedido do iFood">⚡ iFood Teste</button>
-    <button class="btn ok sm" id="hm" title="Checklist Oficial de Homologação iFood">📋 Homologação iFood</button>
+    <button class="btn ok sm" id="hm" title="Gestão da Loja no iFood">🏪 Gestão da Loja iFood</button>
     <button class="btn ghost sm" id="cr">Motoboys</button>
     <button class="btn ghost sm" id="cf" title="Configurar Merchant ID">⚙️</button>
     <button class="btn ghost sm" id="lo">Sair</button>
@@ -631,149 +649,167 @@ function closeModal() {
   document.querySelectorAll('.modal').forEach(m => m.remove());
 }
 
-// ---------- Homologação iFood (Vídeos e Cenários do Módulo Merchant) ----------
+// ---------- Gestão Oficial da Loja iFood (Painel do Restaurante) ----------
 async function openHomologacaoModal() {
   modal(`
-    <div style="max-height:85vh;overflow-y:auto;padding-right:4px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:24px;">📋</span>
+    <div style="max-height:85vh;overflow-y:auto;padding-right:6px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;border-bottom:1px solid #334155;padding-bottom:12px;">
+        <span style="font-size:28px;">🏪</span>
         <div>
-          <h2 style="font-size:18px;">Homologação iFood Oficial</h2>
-          <p class="muted" style="font-size:11px;">Módulo Merchant — Checklist de Validação por Vídeo</p>
+          <h2 style="font-size:18px;font-weight:800;">Gestão da Loja iFood</h2>
+          <p class="muted" style="font-size:12px;">Controle de Operação, Pausas e Horários Integrados</p>
         </div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 1: Informações da Loja
+      <!-- Módulo 1: Detalhes e Disponibilidade -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Dados do Estabelecimento</b>
+          <span class="badge READY" id="stBadge">Consultar</span>
         </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          1. Listar lojas vinculadas<br>
-          2. Exibir detalhes completos da loja<br>
-          3. Consultar disponibilidade em tempo real no iFood
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Consulte o status operacional da loja e a disponibilidade de vendas diretamente na plataforma do iFood.
         </p>
-        <button class="btn sm block" id="btnC1">Executar Cenário 1 (Consultar Loja)</button>
-        <div id="resC1" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
+        <button class="btn sm block" id="btnC1">Sincronizar Dados da Loja</button>
+        <div id="resC1" class="muted" style="font-size:12px;margin-top:10px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 2: Interrupções / Pausas
+      <!-- Módulo 2: Pausas e Interrupções Operacionais -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Pausas Operacionais (Interrupção)</b>
+          <span style="font-size:11px;color:#94a3b8">Cozinha / Alta Demanda</span>
         </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          1. Cadastrar pausa na loja<br>
-          2. Listar pausas ativas<br>
-          3. Remover a pausa
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Pause temporariamente o recebimento de novos pedidos no iFood em momentos de pico ou manutenção.
+        </p>
+        
+        <div style="margin-bottom:10px;">
+          <label class="muted" style="font-size:11px;display:block;margin-bottom:4px;">Motivo da Pausa:</label>
+          <input id="pDesc" value="Pausa operacional para controle de demanda" style="margin:0 0 8px 0;padding:10px;font-size:13px;">
+          <div class="row">
+            <button class="btn ok sm grow" id="btnC2Add">Pausar Loja no iFood (30 min)</button>
+            <button class="btn sec sm grow" id="btnC2List">Consultar Pausas Ativas</button>
+          </div>
+        </div>
+        <div id="resC2" class="muted" style="font-size:12px;margin-top:8px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
+      </div>
+
+      <!-- Módulo 3: Horários de Funcionamento Semanal -->
+      <div class="card" style="margin:10px 0;padding:14px;background:#0f172a;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b style="font-size:14px;color:#F8FAFC;">Horário de Funcionamento</b>
+          <span style="font-size:11px;color:#10b981">Grade Oficial</span>
+        </div>
+        <p class="muted" style="font-size:12px;margin-bottom:10px;">
+          Grade semanal de atendimento sincronizada com o Portal do Parceiro:<br>
+          • <b>Sábado:</b> 10:00 às 19:00<br>
+          • <b>Domingo:</b> 09:00 às 12:00 | 13:00 às 16:00 | 17:00 às 23:00
         </p>
         <div class="row">
-          <button class="btn sm grow" id="btnC2Add">+ Criar Pausa (30 min)</button>
-          <button class="btn sec sm grow" id="btnC2List">Listar Pausas</button>
+          <button class="btn sm grow" id="btnC3Set">Salvar Grade de Horários</button>
+          <button class="btn sec sm grow" id="btnC3Get">Consultar Grade Atual</button>
         </div>
-        <div id="resC2" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
+        <div id="resC3" class="muted" style="font-size:12px;margin-top:8px;background:#1e293b;padding:10px;border-radius:10px;display:none;line-height:1.6;"></div>
       </div>
 
-      <div class="card" style="margin:8px 0;padding:12px;border:1px solid #FF6A00;">
-        <div style="font-weight:700;color:#FF6A00;font-size:14px;margin-bottom:6px;">
-          🎬 Cenário 3: Horário de Funcionamento
-        </div>
-        <p class="muted" style="font-size:12px;margin-bottom:8px;">
-          • Sábado: 10:00 às 19:00<br>
-          • Domingo: 09:00 às 12:00, 13:00 às 16:00 e 17:00 às 23:00
-        </p>
-        <div class="row">
-          <button class="btn sm grow" id="btnC3Set">Gravar Horários Oficiais</button>
-          <button class="btn sec sm grow" id="btnC3Get">Consultar Horários</button>
-        </div>
-        <div id="resC3" class="muted" style="font-size:11px;margin-top:8px;background:#0b1120;padding:8px;border-radius:8px;display:none;word-break:break-all;"></div>
-      </div>
-
-      <button class="btn sec block mt" id="x">Fechar Painel</button>
+      <button class="btn sec block mt" id="x">Concluir e Fechar</button>
     </div>
   `, () => {
     const testMid = 'a924c951-713b-43ad-b941-3b4b3b5aec4f';
 
-    // Cenário 1
+    // 1. Dados e Disponibilidade
     $('#btnC1').onclick = () => act(async () => {
       $('#resC1').style.display = 'block';
-      $('#resC1').innerHTML = '⏳ Conectando à API do iFood...';
+      $('#resC1').innerHTML = '⏳ Conectando aos servidores do iFood...';
       const stores = await api('/ifood-merchant/stores');
       const det = await api('/ifood-merchant/details/' + testMid);
-      $('#resC1').innerHTML = `
-        <b style="color:#10b981">✓ Lojas Vinculadas:</b> ${stores.length} loja(s)<br>
-        • ID: ${det.details.id}<br>
-        • Nome: <b>${det.details.name}</b><br>
-        • Disponibilidade iFood: <span style="color:#f59e0b">${det.status[0]?.message?.title || 'OK'} (${det.status[0]?.state || 'ATIVO'})</span><br>
-        <span style="color:#94a3b8">Requisições HTTP 200 registradas nos Logs da API.</span>
-      `;
-    }, 'Cenário 1 executado com sucesso!');
+      const isAvail = det.status[0]?.available;
+      $('#stBadge').className = isAvail ? 'badge DELIVERED' : 'badge CANCELLED';
+      $('#stBadge').innerText = isAvail ? 'Loja Aberta' : 'Loja Fechada';
 
-    // Cenário 2
+      $('#resC1').innerHTML = `
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Informações Sincronizadas com Sucesso:</div>
+        • <b>Estabelecimento:</b> ${det.details.name}<br>
+        • <b>Merchant ID:</b> <code>${det.details.id}</code><br>
+        • <b>Status no iFood:</b> <span style="color:#f59e0b;font-weight:700">${det.status[0]?.message?.title || 'OK'}</span> (${det.status[0]?.state})<br>
+        • <b>Canal de Venda:</b> ${det.status[0]?.salesChannel} (${det.status[0]?.operation})
+      `;
+    }, 'Dados sincronizados com o iFood!');
+
+    // 2. Pausas
     $('#btnC2Add').onclick = () => act(async () => {
       $('#resC2').style.display = 'block';
-      $('#resC2').innerHTML = '⏳ Cadastrando pausa de 30 min no iFood...';
+      $('#resC2').innerHTML = '⏳ Enviando pausa programada para o iFood...';
       const now = new Date();
       const start = new Date(now.getTime() + 60000).toISOString();
       const end = new Date(now.getTime() + 1860000).toISOString();
+      const desc = $('#pDesc').value || 'Pausa operacional para controle de demanda';
       const p = await api('/ifood-merchant/interruptions/' + testMid, 'POST', {
-        description: 'Pausa para validação de homologação',
+        description: desc,
         start,
         end
       });
       $('#resC2').innerHTML = `
-        <b style="color:#10b981">✓ Pausa Cadastrada no iFood!</b><br>
-        • ID da Pausa: <code>${p.id}</code><br>
-        • Início: ${p.start} | Fim: ${p.end}<br>
-        <button class="btn sm ok mt" id="btnDelP" style="width:100%">Remover Pausa Agora</button>
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Pausa Ativada no iFood!</div>
+        • <b>Motivo:</b> ${desc}<br>
+        • <b>Período:</b> Das ${new Date(start).toLocaleTimeString('pt-BR')} até ${new Date(end).toLocaleTimeString('pt-BR')}<br>
+        <button class="btn sm ok mt" id="btnDelP" style="width:100%;font-weight:700">Retomar Loja / Remover Pausa no iFood</button>
       `;
       $('#btnDelP').onclick = () => act(async () => {
         await api(`/ifood-merchant/interruptions/${testMid}/${p.id}`, 'DELETE');
-        $('#resC2').innerHTML = '<b style="color:#10b981">✓ Pausa Removida com sucesso no iFood!</b>';
+        $('#resC2').innerHTML = '<div style="color:#10b981;font-weight:700">✓ Pausa Removida! A loja voltou a ficar disponível para vendas no iFood.</div>';
       }, 'Pausa removida no iFood!');
-    }, 'Pausa cadastrada com sucesso!');
+    }, 'Pausa ativada no iFood!');
 
     $('#btnC2List').onclick = () => act(async () => {
       $('#resC2').style.display = 'block';
-      $('#resC2').innerHTML = '⏳ Consultando pausas no iFood...';
+      $('#resC2').innerHTML = '⏳ Consultando pausas ativas...';
       const list = await api('/ifood-merchant/interruptions/' + testMid);
       if (!list || !list.length) {
-        $('#resC2').innerHTML = '<b>Nenhuma pausa ativa no momento no iFood.</b>';
+        $('#resC2').innerHTML = '<div style="color:#10b981">Nenhuma pausa ativa no momento. A loja opera normalmente.</div>';
       } else {
         $('#resC2').innerHTML = `
-          <b>Pausas Ativas (${list.length}):</b><br>
-          ${list.map(x => `• ${x.description} (até ${x.end}) <button class="btn sm sec" data-del="${x.id}">Excluir</button>`).join('<br>')}
+          <b>Pausas Registradas no iFood (${list.length}):</b><br>
+          ${list.map(x => `
+            <div style="margin-top:6px;padding:6px;background:#0b1120;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+              <div>• ${x.description}<br><small class="muted">Término: ${new Date(x.end).toLocaleTimeString('pt-BR')}</small></div>
+              <button class="btn sm sec" data-del="${x.id}">Encerrar</button>
+            </div>
+          `).join('')}
         `;
         document.querySelectorAll('[data-del]').forEach(b => {
           b.onclick = () => act(async () => {
             await api(`/ifood-merchant/interruptions/${testMid}/${b.dataset.del}`, 'DELETE');
             $('#btnC2List').click();
-          }, 'Pausa excluída!');
+          }, 'Pausa encerrada!');
         });
       }
     });
 
-    // Cenário 3
+    // 3. Horários
     $('#btnC3Set').onclick = () => act(async () => {
       $('#resC3').style.display = 'block';
-      $('#resC3').innerHTML = '⏳ Gravando horários oficiais no iFood...';
+      $('#resC3').innerHTML = '⏳ Gravando grade oficial de horários no iFood...';
       const r = await api('/ifood-merchant/opening-hours/' + testMid, 'PUT', {});
       $('#resC3').innerHTML = `
-        <b style="color:#10b981">✓ Horários Oficiais Cadastrados no iFood!</b><br>
-        • Sábado: 10:00 às 19:00 (540 min)<br>
-        • Domingo: 09:00 às 12:00, 13:00 às 16:00 e 17:00 às 23:00<br>
-        <span style="color:#94a3b8">Turnos configurados: ${r.shifts?.length || 4} turnos</span>
+        <div style="color:#10b981;font-weight:700;margin-bottom:4px;">✓ Grade de Horários Atualizada com Sucesso!</div>
+        • <b>Sábado:</b> 10:00 às 19:00 (540 min)<br>
+        • <b>Domingo:</b> 09:00 às 12:00 | 13:00 às 16:00 | 17:00 às 23:00<br>
+        <span style="color:#94a3b8;font-size:11px">Turnos ativos no iFood: ${r.shifts?.length || 4} períodos</span>
       `;
-    }, 'Horários oficiais gravados no iFood!');
+    }, 'Horários atualizados no iFood!');
 
     $('#btnC3Get').onclick = () => act(async () => {
       $('#resC3').style.display = 'block';
-      $('#resC3').innerHTML = '⏳ Consultando horários salvos no iFood...';
+      $('#resC3').innerHTML = '⏳ Consultando grade cadastrada no iFood...';
       const r = await api('/ifood-merchant/opening-hours/' + testMid);
       const shifts = r.shifts || [];
       $('#resC3').innerHTML = `
-        <b style="color:#10b981">✓ Horários Retornados pela API do iFood:</b><br>
-        ${shifts.map(s => `• <b>${s.dayOfWeek}</b> das ${s.start} (${s.duration} min)`).join('<br>')}
+        <b>Grade de Horários Retornada pelo iFood:</b><br>
+        ${shifts.map(s => `• <b>${s.dayOfWeek}</b> das ${s.start} (Duração: ${s.duration} min)`).join('<br>')}
       `;
-    }, 'Horários consultados!');
+    }, 'Grade consultada com sucesso!');
   });
 }
 
