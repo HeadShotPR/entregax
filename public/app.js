@@ -366,6 +366,7 @@ function renderStore() {
       </div>
     </div>
     <button class="btn ghost sm" id="nw">+ Pedido</button>
+    <button class="btn ok sm" id="pl" title="Puxar Pedidos do iFood">🔄 Sincronizar iFood</button>
     <button class="btn ok sm" id="hm" title="Gestão da Loja no iFood">🏪 Gestão da Loja iFood</button>
     <button class="btn ghost sm" id="cr">Motoboys</button>
     <button class="btn ghost sm" id="cf" title="Configurar Merchant ID">⚙️</button>
@@ -384,6 +385,11 @@ function renderStore() {
   initMap();
 
   $('#lo').onclick = logout;
+  $('#pl').onclick = () => act(async () => {
+    const res = await api('/ifood/pull', 'POST');
+    await refresh();
+    toast(res.count > 0 ? `${res.count} novo(s) pedido(s) iFood recebido(s)!` : 'Nenhum novo pedido pendente no iFood.');
+  });
   $('#hm').onclick = openHomologacaoModal;
   
   $('#cf').onclick = () => modal(`

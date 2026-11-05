@@ -133,14 +133,21 @@ function importIfoodOrder(o, store) {
     status: 'READY', courierId: null, createdAt: Date.now()
   });
 }
-// Envia status de volta ao iFood (best-effort; só para pedidos vindos do iFood)
+// Envia status de volta ao iFood (com a sequência correta: readyToPickup -> dispatch)
 async function ifoodStatus(order, action) {
-  if (order.source !== 'ifood' || !process.env.IFOOD_CLIENT_ID) return;
+  if (order.source !== 'ifood' || !order.ifoodId) return;
   try {
     const t = await ifoodAuth();
-    const r = await fetch(`${IFOOD}/order/v1.0/orders/${order.ifoodId}/${action}`, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
-    if (!r.ok) console.error(`iFood ${action} ${order.ifoodId}: HTTP ${r.status}`);
-  } catch (e) { console.error('iFood status:', e.message); }
+    const H = { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' };
+    if (action === 'dispatch') {
+      // Regra iFood: readyToPickup antes do dispatch
+      await fetch(`${IFOOD}/order/v1.0/orders/${order.ifoodId}/readyToPickup`, { method: 'POST', headers: H }).catch(() => {});
+      const r = await fetch(`${IFOOD}/order/v1.0/orders/${order.ifoodId}/dispatch`, { method: 'POST', headers: H });
+      console.log(`iFood Dispatch ${order.ifoodId}: HTTP ${r.status}`);
+    }
+  } catch (e) {
+    console.error('iFood status error:', e.message);
+  }
 }
 async function ifoodPoll() {
   if (!process.env.IFOOD_CLIENT_ID) return;
@@ -262,7 +269,43 @@ async function api(req, res, url) {
     changed(); return json(res, 200, { ok: true });
   }
 
-  // Webhook opcional (iFood push) — protegido por segredo
+  // Botão da Loja: Puxar pedidos pendentes do iFood em tempo real
+  if (p === '/api/ifood/pull' && m === 'POST') {
+    if (!isStore) return forbid();
+    try {
+      const t = await ifoodAuth(), H = { Authorization: 'Bearer ' + t };
+      const r = await fetch(IFOOD + '/events/v1.0/events:polling', { headers: H });
+      let importedCount = 0;
+      if (r.status === 200) {
+        const evs = await r.json();
+        const acks = [];
+        for (const e of evs) {
+          acks.push({ id: e.id });
+          if (e.code === 'PLC') {
+            const oRes = await fetch(`${IFOOD}/order/v1.0/orders/${e.orderId}`, { headers: H });
+            if (oRes.status === 200) {
+              const o = await oRes.json();
+              importIfoodOrder(o, store);
+              importedCount++;
+              // Auto-confirmar pedido no iFood
+              fetch(`${IFOOD}/order/v1.0/orders/${e.orderId}/confirm`, { method: 'POST', headers: H }).catch(() => {});
+            }
+          }
+        }
+        if (acks.length) {
+          await fetch(IFOOD + '/events/v1.0/events/acknowledgment', {
+            method: 'POST',
+            headers: { ...H, 'Content-Type': 'application/json' },
+            body: JSON.stringify(acks)
+          });
+        }
+        if (importedCount > 0) changed();
+      }
+      return json(res, 200, { ok: true, count: importedCount });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
   const mm = p.match(/^\/api\/orders\/(\w+)\/(\w+)$/);
   if (mm && m === 'POST') {
     const o = db.orders.find(x => x.id === mm[1] && x.storeId === user.storeId), act = mm[2];
